@@ -16,7 +16,7 @@ class Foodlist extends StatefulWidget {
 class _FoodlistState extends State<Foodlist> {
   Future<List<Food>> foodFuture = getFood();
   static Future<List<Food>> getFood() async {
-    final response = await http.get(Uri.parse('http://192.168.3.96/se_project/view_product.php'));
+    final response = await http.get(Uri.parse('http://10.0.2.2/flutter_login/view_product.php'));
     var data = json.decode(response.body);
     late SharedPreferences pref;
     pref = await SharedPreferences.getInstance();

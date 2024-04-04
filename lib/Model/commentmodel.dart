@@ -2,14 +2,14 @@ class commentModel {
   String userId;
   String postId;
   String name;
-  String image;
+  String userimage;
   String comment;
 
   commentModel({
     required this.userId,
     required this.postId,
     required this.name,
-    required this.image,
+    required this.userimage,
     required this.comment,
   });
 
@@ -17,7 +17,7 @@ class commentModel {
         userId: json['user_id'] ?? '',
         postId: json['post_id'] ?? '',
         name: json['name'] ?? '',
-        image: json['image'] ?? '',
+        userimage: json['image'] ?? '',
         comment: json['comment'] ?? '',
       );
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jobspot_admin/Screens/Foodlist.dart';
+import 'package:jobspot_admin/Screens/Home.dart';
 
 class instructionsScreen extends StatefulWidget {
   final String foodImg;
@@ -28,7 +29,7 @@ class _instructionsScreenState extends State<instructionsScreen> {
   Future deleteFood() async {
     var id = widget.foodID;
 
-    var uri = Uri.parse("http://192.168.3.96/se_project/deletefood.php");
+    var uri = Uri.parse("http://10.0.2.2/flutter_login/deletefood.php");
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['food_id'] = id;
@@ -58,7 +59,10 @@ class _instructionsScreenState extends State<instructionsScreen> {
         title: Text('ข้อมูลอาหาร'),
         leading: IconButton(
           onPressed: () {
-            widget.onBackNavigate();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -78,7 +82,7 @@ class _instructionsScreenState extends State<instructionsScreen> {
             child: Column(
               children: [
                 Image.network(
-                  'http://192.168.3.96/se_project/img/${widget.foodImg}',
+                  'http://10.0.2.2/flutter_login/img/${widget.foodImg}',
                 ),
                 SizedBox(
                   height: 20,

@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:jobspot_admin/Model/commentmodel.dart';
 import 'package:jobspot_admin/Screens/Ecom.dart';
+import 'package:jobspot_admin/Screens/Home.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class instructionScreen extends StatefulWidget {
   final String userId;
   final String postId;
   final String image;
+  final String userimage;
   final String topic;
   final String descrip;
   final VoidCallback onBackNavigate;
@@ -18,27 +22,45 @@ class instructionScreen extends StatefulWidget {
     required this.userId,
     required this.postId,
     required this.image,
+    required this.userimage,
     required this.topic,
     required this.descrip,
     required this.onBackNavigate,
   }) : super(key: key);
 
   @override
-  State<instructionScreen> createState() => _instructionScreenState();
+  State<instructionScreen> createState() => _InstructionScreenState();
 }
 
-class _instructionScreenState extends State<instructionScreen> {
+class _InstructionScreenState extends State<instructionScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late Future<List<commentModel>> getComment;
+
+  late SharedPreferences pref;
+  late String username = "";
+  late String id = "";
+  String pic = "";
+
+  Future<void> dud() async {
+    pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString('username').toString();
+      id = pref.getString('id').toString();
+      pic = pref.getString('pic').toString();
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     getComment = getIngredient(widget.userId, widget.postId);
+    dud();
   }
 
   Future<List<commentModel>> getIngredient(String userId, String postId) async {
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://192.168.3.96/se_project/showcomment.php'));
+          'POST', Uri.parse('http://10.0.2.2/flutter_login/showcomment.php'));
       request.fields['user_id'] = userId;
       request.fields['post_id'] = postId;
 
@@ -60,20 +82,16 @@ class _instructionScreenState extends State<instructionScreen> {
   }
 
   TextEditingController comment = TextEditingController();
-  Future add_comment() async {
-    var id = widget.userId;
+
+  Future addComment() async {
     var postid = widget.postId;
 
-    var uri = Uri.parse("http://192.168.3.96/se_project/comment.php");
+    var uri = Uri.parse("http://10.0.2.2/flutter_login/comment.php");
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['user_id'] = id;
     request.fields['post_id'] = postid;
     request.fields['comment'] = comment.text;
-
-    print(id);
-    print(postid);
-    print(comment.text);
 
     var response = await request.send();
 
@@ -81,6 +99,11 @@ class _instructionScreenState extends State<instructionScreen> {
       print('comment Uploaded');
       String responseBody = await response.stream.bytesToString();
       print(responseBody);
+      // Reload the comments after adding a new comment
+      setState(() {
+        getComment = getIngredient(widget.userId, widget.postId);
+        comment.clear();
+      });
     } else {
       print('comment Not Uploaded');
     }
@@ -89,7 +112,7 @@ class _instructionScreenState extends State<instructionScreen> {
   Future deletePost() async {
     var id = widget.postId;
 
-    var uri = Uri.parse("http://192.168.3.96/se_project/deletePost.php");
+    var uri = Uri.parse("http://10.0.2.2/flutter_login/deletePost.php");
     var request = http.MultipartRequest('POST', uri);
 
     request.fields['post_id'] = id;
@@ -107,7 +130,7 @@ class _instructionScreenState extends State<instructionScreen> {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Ecom()),
+      MaterialPageRoute(builder: (context) => const Ecom()),
     );
   }
 
@@ -116,10 +139,13 @@ class _instructionScreenState extends State<instructionScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 250, 162, 53),
-        title: Text('โพสต์'),
+        title: const Text('รายละเอียดโพส'),
         leading: IconButton(
           onPressed: () {
-            widget.onBackNavigate();
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
           },
           icon: const Icon(Icons.arrow_back),
         ),
@@ -133,129 +159,68 @@ class _instructionScreenState extends State<instructionScreen> {
         ],
       ),
       body: ListView(
+        padding: const EdgeInsets.all(16),
         children: [
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Image.network(
-                  'http://192.168.3.96/se_project/img/${widget.image}',
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      widget.topic,
-                      style:
-                          TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      widget.descrip,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 8,
-                ),
-                Container(
-                  margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 0),
-                  padding: EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: const Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'Comments',
-                          style: TextStyle(
-                              fontSize: 18.0, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                TextFormField(
-                  decoration: InputDecoration(hintText: 'comment'),
-                  controller: comment,
-                ),
-                Container(
-                  child: TextButton(
-                    onPressed: () {
-                      add_comment();
-                    },
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.comment),
-                        SizedBox(width: 5.0),
-                        Text('comment'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          FutureBuilder<List<commentModel>>(
-            future: getComment,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              } else if (snapshot.hasData && snapshot.data != null) {
-                final comments = snapshot.data!;
-                return buildRecipe(comments);
-              } else {
-                return const Text('No comments available');
-              }
-            },
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                'http://10.0.2.2/flutter_login/upload/${widget.image}',
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                widget.topic,
+                style:
+                    const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.descrip,
+                style: const TextStyle(fontSize: 16),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Comments',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              FutureBuilder<List<commentModel>>(
+                future: getComment,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    final comments = snapshot.data!;
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: comments
+                          .map((comment) => ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                    'http://10.0.2.2/flutter_login/upload/${comment.userimage}',
+                                  ),
+                                ),
+                                title: Text(comment.name),
+                                subtitle: Text(comment.comment),
+                              ))
+                          .toList(),
+                    );
+                  } else {
+                    return const Text('No comments available');
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),
     );
   }
-
-  Widget buildRecipe(List<commentModel> getComment) => SizedBox(
-        height: 200, // Adjust height as per your requirement
-        child: ListView.builder(
-          itemCount: getComment.length,
-          itemBuilder: (context, index) {
-            final recipe = getComment[index];
-            return Card(
-              child: InkWell(
-                splashColor: Colors.blue.withAlpha(30),
-                onTap: () {},
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          'http://192.168.3.96/se_project/img/${widget.image}',
-                        ),
-                      ),
-                      title: Text(recipe.name),
-                      subtitle: Text(recipe.comment),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
-      );
 }

@@ -17,7 +17,7 @@ class _EcomState extends State<Ecom> {
   Future<List<postModel>> postFuture = getPost();
   static Future<List<postModel>> getPost() async {
     final response = await http
-        .get(Uri.parse('http://192.168.3.96/se_project/viewpost.php'));
+        .get(Uri.parse('http://10.0.2.2/flutter_login/viewpost.php'));
     var data = json.decode(response.body);
     late SharedPreferences pref;
     pref = await SharedPreferences.getInstance();
@@ -53,9 +53,10 @@ class _EcomState extends State<Ecom> {
                     image: user.image,
                     topic: user.topic,
                     descrip: user.descrip,
+                    userimage: user.image,
                     onBackNavigate: () {
                       Navigator.pop(context);
-                    },
+                    }, 
                   ),
                 ),
               );
@@ -71,7 +72,7 @@ class _EcomState extends State<Ecom> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ร้านค้าทั้งหมด',
+          'โพสทั้งหมด',
         ),
       ),
       body: Center(

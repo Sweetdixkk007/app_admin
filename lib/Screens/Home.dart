@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => Ecom()));
               },
-              child: Text('ดูร้านค้าทั้งหมด'),
+              child: Text('จัดการโพสทั้งหมด'),
             ),
             SizedBox(height: 20), // Add some spacing between the buttons
             ElevatedButton(
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => Foodlist()));
               },
-              child: Text('ดูรายการอาหารทั้งหมด'),
+              child: Text('จัดการรายการอาหารทั้งหมด'),
             ),
           ],
         ),
