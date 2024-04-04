@@ -181,7 +181,7 @@ class _InstructionScreenState extends State<instructionScreen> {
                 widget.descrip,
                 style: const TextStyle(fontSize: 16),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 3,
+                maxLines: 100,
               ),
               const SizedBox(height: 20),
               const Text(

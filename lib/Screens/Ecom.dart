@@ -64,7 +64,6 @@ class _EcomState extends State<Ecom> {
             child: Card(
               child: ListTile(
                 title: Text(user.topic),
-                subtitle: Text(user.descrip),
               ),
             ),
           );
